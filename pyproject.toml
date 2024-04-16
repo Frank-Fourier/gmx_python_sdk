@@ -22,13 +22,15 @@ include = ["gmx_python_sdk", "gmx_python_sdk.*"]
 namespaces = false
 
 [tool.poetry.dependencies]
-python = ">= 3.10.4"
+python = ">=3.10.4,<4"
 numpy = ">= 1.26.3"
-hexbytes = ">= 0.3.1"
+hexbytes = ">= 0.2.0,<0.4.0"
 web3 = ">= 6.10.0"
 pyyaml = ">= 6.0.1"
 pandas = ">= 1.4.2"
 numerize = ">= 0.12"
+python-socketio = ">= 5.4.0"
+eth-utils = { version = "*", python = ">=3.7,<4" }
 
 [build-system]
 requires = ["poetry-core"]
