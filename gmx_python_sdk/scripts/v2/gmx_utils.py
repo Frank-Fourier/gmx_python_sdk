@@ -188,18 +188,6 @@ def get_config(filepath: str = os.path.join(base_dir, "config.yaml")):
 
     config = Config(filepath).load_config()
 
-    if config['private_key'] is None:
-        logging.warning("Private key not set!")
-
-    if config['arbitrum']['rpc'] is None:
-        logging.warning("Arbitrum RPC not set!")
-
-    if config['avalanche']['rpc'] is None:
-        logging.warning("Avalanche RPC not set!")
-
-    if config['user_wallet_address'] is None:
-        logging.warning("Wallet address not set!")
-
     return config
 
 
