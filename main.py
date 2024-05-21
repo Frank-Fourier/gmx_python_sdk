@@ -14,10 +14,11 @@ app = web.Application()
 sio.attach(app)
 
 price_updates = {}
+fetch_in_progress = False
 
 config = {
     'arbitrum': {
-        'rpc': "https://arbitrum-mainnet.infura.io/v3/cd67bf30b3a64391805989ba259cec10",
+        'rpc': "https://arbitrum-mainnet.infura.io/v3/b165ca4a2a7f4583bebae070d32e8f43",
         'chain_id': 42161
     },
     'avalanche': {
@@ -40,20 +41,25 @@ if not web3_connection.is_connected():
 gm_prices = GMPrices(chain='arbitrum')
 
 async def fetch_prices():
+    global fetch_in_progress
+    if fetch_in_progress:
+        return
+    fetch_in_progress = True
     try:
         prices = await loop.run_in_executor(None, gm_prices.get_price_traders)
-        return prices
+        if prices:
+            price_updates.update(prices)
+            print(f"Prices updated: {price_updates}")
     except Exception as e:
         print(f"An error occurred while fetching prices: {e}")
-        return None
+    finally:
+        fetch_in_progress = False
 
 async def send_price_updates():
     while True:
-        prices = await fetch_prices()
-        if prices:
-            price_updates.update(prices)
-            await sio.emit('price_update', price_updates)
-            print(f"Prices updated and emitted: {price_updates}")
+        await sio.emit('price_update', price_updates)
+        print(f"Prices emitted: {price_updates}")
+        await asyncio.sleep(20)  # Interval for emitting updates
 
 # Event handler for new connections
 @sio.event
@@ -69,8 +75,17 @@ async def disconnect(sid):
 # Run the server
 async def start_server():
     port = int(os.getenv('PORT', 8000))
-    # Add the hello_world_task to the event loop
+    # Add the tasks to the event loop
     asyncio.create_task(send_price_updates())
+    asyncio.create_task(fetch_prices())  # Trigger the initial fetch
+
+    async def fetch_prices_loop():
+        while True:
+            await fetch_prices()
+            await asyncio.sleep(5)  # Interval for fetching prices
+
+    asyncio.create_task(fetch_prices_loop())
+    
     # Run the aiohttp web app
     runner = web.AppRunner(app)
     await runner.setup()
