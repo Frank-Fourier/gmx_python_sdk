@@ -50,6 +50,7 @@ async def fetch_prices():
         if prices:
             price_updates.update(prices)
             print(f"Prices updated: {price_updates}")
+            await sio.emit('price_update', price_updates)
     except Exception as e:
         print(f"An error occurred while fetching prices: {e}")
     finally:
@@ -72,19 +73,18 @@ async def connect(sid, environ):
 async def disconnect(sid):
     print(f"Client disconnected: {sid}")
 
+# Define the fetch prices loop
+async def fetch_prices_loop():
+    while True:
+        await fetch_prices()
+        await asyncio.sleep(5)  # Interval for fetching prices
+
 # Run the server
 async def start_server():
     port = int(os.getenv('PORT', 8000))
     # Add the tasks to the event loop
     asyncio.create_task(send_price_updates())
-    asyncio.create_task(fetch_prices())  # Trigger the initial fetch
-
-    async def fetch_prices_loop():
-        while True:
-            await fetch_prices()
-            await asyncio.sleep(5)  # Interval for fetching prices
-
-    asyncio.create_task(fetch_prices_loop())
+    asyncio.create_task(fetch_prices_loop())  # Start the price fetching loop
     
     # Run the aiohttp web app
     runner = web.AppRunner(app)
