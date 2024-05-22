@@ -60,7 +60,7 @@ async def send_price_updates():
     while True:
         await sio.emit('price_update', price_updates)
         print(f"Prices emitted: {price_updates}")
-        await asyncio.sleep(20)  # Interval for emitting updates
+        await asyncio.sleep(30)  # Interval for emitting updates
 
 # Event handler for new connections
 @sio.event
@@ -77,7 +77,7 @@ async def disconnect(sid):
 async def fetch_prices_loop():
     while True:
         await fetch_prices()
-        await asyncio.sleep(5)  # Interval for fetching prices
+        await asyncio.sleep(30)  # Interval for fetching prices
 
 # Run the server
 async def start_server():
