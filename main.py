@@ -18,7 +18,7 @@ fetch_in_progress = False
 
 config = {
     'arbitrum': {
-        'rpc': "https://arbitrum-mainnet.infura.io/v3/b165ca4a2a7f4583bebae070d32e8f43",
+        'rpc': "https://arbitrum-mainnet.infura.io/v3/a313cf89c2134977b427d8d0c49e9480",
         'chain_id': 42161
     },
     'avalanche': {
