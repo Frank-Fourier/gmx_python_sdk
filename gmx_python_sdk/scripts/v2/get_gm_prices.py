@@ -1,16 +1,15 @@
+import time
 from .gmx_utils import (
     get_reader_contract, contract_map, execute_threading,
     save_json_file_to_datastore, make_timestamped_dataframe,
     save_csv_to_datastore
 )
-
 from .get_oracle_prices import GetOraclePrices
 from .get_markets import GetMarkets
 from .keys import (
     MAX_PNL_FACTOR_FOR_TRADERS, MAX_PNL_FACTOR_FOR_DEPOSITS,
     MAX_PNL_FACTOR_FOR_WITHDRAWALS
 )
-
 
 class GMPrices:
     def __init__(self, chain: str):
@@ -101,6 +100,10 @@ class GMPrices:
 
         """
         markets = GetMarkets(chain=self.chain).get_available_markets()
+        
+        # Add a delay of 1 second
+        time.sleep(1)
+        
         prices = GetOraclePrices(chain=self.chain).get_recent_prices()
 
         output_list = []
@@ -239,6 +242,7 @@ class GMPrices:
         data_store_contract_address = (
             contract_map[self.chain]['datastore']['contract_address']
         )
+        time.sleep(1)
 
         # maximise to take max prices in calculation
         maximise = True
