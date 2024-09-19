@@ -86,7 +86,7 @@ async def disconnect(sid):
 async def fetch_prices_loop():
     while True:
         await fetch_prices()
-        await asyncio.sleep(30)  # Interval for fetching prices
+        await asyncio.sleep(60)  # Interval for fetching prices
 
 # Run the server
 async def start_server():
