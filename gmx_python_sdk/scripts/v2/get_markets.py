@@ -23,12 +23,12 @@ class GetMarkets:
 
     def _get_available_markets_raw(self):
         """
-        Get the available markets from the reader contract
+        Get the available markets from the reader contract and optionally filter by specific addresses
 
         Returns
         -------
         Markets: tuple
-            tuple of raw output from the reader contract.
+            tuple of raw output from the reader contract, filtered if target_markets provided.
 
         """
         reader_contract = get_reader_contract(self.chain)
@@ -39,10 +39,25 @@ class GetMarkets:
         raw_markets = reader_contract.functions.getMarkets(
             data_store_contract_address,
             0,
-            17
+            1000
         ).call()
         
-        print("\nRaw Markets from GMX Contract:")
+        target_markets = [
+            "0x7f1fa204bb700853D36994DA19F830b6Ad18455C",
+            "0x09400D9DB990D5ed3f35D7be61DfAEB900Af03C9",
+            "0x2b477989A149B17073D9C9C82eC9cB03591e20c6",
+            "0x47c031236e19d024b42f8AE6780E44A573170703"
+        ]
+        
+        if target_markets:
+            # Convert to lowercase for case-insensitive comparison
+            target_markets = [addr.lower() for addr in target_markets]
+            raw_markets = [
+                market for market in raw_markets 
+                if market[0].lower() in target_markets
+            ]
+        
+        print("\nFiltered Markets from GMX Contract:")
         for market in raw_markets:
             print(f"""
 Market Details:
@@ -61,7 +76,7 @@ Market Details:
         Returns
         -------
         decoded_markets : dict
-            dictionary decoded market data.
+            dictionary of decoded market data.
 
         """
         token_address_dict = get_tokens_address_dict(self.chain)
