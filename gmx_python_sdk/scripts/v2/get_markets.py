@@ -35,12 +35,24 @@ class GetMarkets:
         data_store_contract_address = (
             contract_map[self.chain]['datastore']['contract_address']
         )
-
-        return reader_contract.functions.getMarkets(
+        
+        raw_markets = reader_contract.functions.getMarkets(
             data_store_contract_address,
             0,
             17
         ).call()
+        
+        print("\nRaw Markets from GMX Contract:")
+        for market in raw_markets:
+            print(f"""
+Market Details:
+- Market Address: {market[0]}
+- Index Token: {market[1]}
+- Long Token: {market[2]}
+- Short Token: {market[3]}
+""")
+        
+        return raw_markets
 
     def _process_markets(self):
         """
