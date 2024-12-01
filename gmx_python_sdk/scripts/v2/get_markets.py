@@ -46,7 +46,8 @@ class GetMarkets:
             "0x7f1fa204bb700853D36994DA19F830b6Ad18455C",
             "0x09400D9DB990D5ed3f35D7be61DfAEB900Af03C9",
             "0x2b477989A149B17073D9C9C82eC9cB03591e20c6",
-            "0x47c031236e19d024b42f8AE6780E44A573170703"
+            "0x47c031236e19d024b42f8AE6780E44A573170703",
+            "0x70d95587d40A2caf56bd97485aB3Eec10Bee6336"
         ]
         
         if target_markets:
