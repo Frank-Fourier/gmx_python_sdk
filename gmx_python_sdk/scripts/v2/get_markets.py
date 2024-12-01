@@ -54,22 +54,13 @@ class GetMarkets:
         """
         token_address_dict = get_tokens_address_dict(self.chain)
         raw_markets = self._get_available_markets_raw()
-        
-        print(f"\nTotal markets found in contract: {len(raw_markets)}")
-        
+
         decoded_markets = {}
-        filtered_out_markets = []
-        
         for raw_market in raw_markets:
             try:
+
                 if not self._check_if_index_token_in_signed_prices_api(raw_market[1]):
-                    filtered_out_markets.append({
-                        'market_address': raw_market[0],
-                        'index_token': raw_market[1],
-                        'reason': 'Not in signed prices API'
-                    })
                     continue
-                
                 decoded_markets[raw_market[0]] = {
                     'gmx_market_address': raw_market[0],
                     'market_symbol': (
@@ -86,19 +77,25 @@ class GetMarkets:
             # If KeyError it is because there is no market symbol and it is a
             # swap market
             except KeyError:
-                filtered_out_markets.append({
-                    'market_address': raw_market[0],
-                    'index_token': raw_market[1],
-                    'reason': 'KeyError during processing'
-                })
-                continue
-        
-        print(f"\nProcessed markets: {len(decoded_markets)}")
-        print(f"Filtered out markets: {len(filtered_out_markets)}")
-        print("\nFiltered out market details:")
-        for market in filtered_out_markets:
-            print(f"- Market {market['market_address']}: {market['reason']}")
-        
+                if not self._check_if_index_token_in_signed_prices_api(raw_market[1]):
+                    continue
+                decoded_markets[raw_market[0]] = {
+                    'gmx_market_address': raw_market[0],
+                    'market_symbol': 'SWAP {}-{}'.format(
+                        token_address_dict[raw_market[2]]['symbol'],
+                        token_address_dict[raw_market[3]]['symbol']
+                    ),
+                    'index_token_address': raw_market[1],
+                    'market_metadata': {'symbol': 'SWAP {}-{}'.format(
+                        token_address_dict[raw_market[2]]['symbol'],
+                        token_address_dict[raw_market[3]]['symbol']
+                    )},
+                    'long_token_metadata': token_address_dict[raw_market[2]],
+                    'long_token_address': raw_market[2],
+                    'short_token_metadata': token_address_dict[raw_market[3]],
+                    'short_token_address': raw_market[3]
+                }
+
         return decoded_markets
 
     def _check_if_index_token_in_signed_prices_api(self, index_token_address):
